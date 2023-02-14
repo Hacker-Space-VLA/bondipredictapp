@@ -11,7 +11,9 @@
   },
   "dependencies": {
     "react": "^18.2.0",
-    "react-native": "^0.71.3"
+    "react-native": "^0.71.3",
+    "react-native-leaflet-view": "^0.1.2",
+    "react-native-webview": "^11.26.1"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",
