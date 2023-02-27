@@ -2,11 +2,10 @@ import React, {useState} from 'react';
 import {Text, View, StatusBar, PermissionsAndroid, Button } from 'react-native';
 import { io } from "socket.io-client";
 import Geolocation from 'react-native-geolocation-service';
-import Leaflet, { Markers, TileOptions,Layers } from 'react-native-leaflet-ts';
+import Leaflet, { Markers, TileOptions, Layers } from 'react-native-leaflet-ts'; 
 
 // vars 
 const lineas: Markers[] = [];
-
 
 
 // Socket
@@ -16,14 +15,15 @@ socket.on("pos", function(data) {
   if(lineas.some(linea => linea.title === data.bus)){
     for (var bus of lineas) {
       if (bus.title = data.bus) {
-        bus.latLng = [data.lat, data.lon]
+        bus.latLng = [parseFloat(data.lat) , parseFloat(data.lon)]
+
       }
     }
       
   } else {
       if (data.bus !== undefined){
           lineas.push({
-              latLng: [data.lat, data.lon],
+              latLng: [parseFloat(data.lat) , parseFloat(data.lon)],
               title: data.bus,
               iconSize: {
                 width: 25,
@@ -31,7 +31,7 @@ socket.on("pos", function(data) {
               },
           });
       }
-  }  
+  }
   console.log(lineas)
 })
 
@@ -64,22 +64,26 @@ const requestLocationPermission = async () => {
     return false;
   }
 };
-var userLocation = {
+
+var usrLocation = {
   lat: 0,
   lng: 0
 }
-
 function getLocation() {
-  
   console.log("asked for Geolocation")
   const result = requestLocationPermission();
   result.then(res => {
-    console.log('res is:', res);
     if (res) {
-      Geolocation.getCurrentPosition(
-        position => {
-          userLocation.lat = position.coords.latitude
-          userLocation.lng = position.coords.longitude
+      Geolocation.getCurrentPosition(position => {
+          usrLocation.lat = position.coords.latitude
+          usrLocation.lng = position.coords.longitude
+          var data = [
+            position.coords.latitude,
+            position.coords.longitude
+          ]
+          console.log(data)
+          
+          return(data)
           //return({lat: position.coords.latitude, lng: position.coords.longitude})
         },
         error => {
@@ -91,7 +95,6 @@ function getLocation() {
       
     }
   });
-  return(userLocation)
 }
 
 // Map
@@ -113,21 +116,19 @@ const mapLayers: Layers[] = [
 
 // App
 const App = () => {
-  console.log("app running")
+  getLocation()
+  var loc = usrLocation
   return (
     <Leaflet
       mapLayers={mapLayers}
-      minZoom={1}
-      zoom={13}
-      maxZoom={20}
+      minZoom={2}
       flyTo={{
         latLng: [-40.7627, -71.6418],
         zoom: 12,
       }}
       markers={lineas}
-      backgroundColor="green"
+      backgroundColor="#b0d4dc"
     />
-  );
+  )
 }
-
 export default App;
