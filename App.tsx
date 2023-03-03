@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {Text, View, StatusBar, PermissionsAndroid, Button } from 'react-native';
 import { io } from "socket.io-client";
 import Geolocation from 'react-native-geolocation-service';
@@ -81,9 +81,8 @@ function getLocation() {
             position.coords.latitude,
             position.coords.longitude
           ]
-          console.log(data)
           
-          return(data)
+          console.log(data)
           //return({lat: position.coords.latitude, lng: position.coords.longitude})
         },
         error => {
@@ -98,8 +97,6 @@ function getLocation() {
 }
 
 // Map
-
-
 const options: TileOptions = {
   noWrap: true,
   updateInterval: 100
@@ -114,20 +111,31 @@ const mapLayers: Layers[] = [
 ];
 
 
+
 // App
 const App = () => {
   getLocation()
-  var loc = usrLocation
+  var [loc, setLoc] = useState([usrLocation.lat, usrLocation.lng]);
   return (
-    <Leaflet
+      <Leaflet
       mapLayers={mapLayers}
       minZoom={2}
       flyTo={{
-        latLng: [-40.7627, -71.6418],
+        latLng: loc,
         zoom: 12,
       }}
       markers={lineas}
       backgroundColor="#b0d4dc"
+      injectJavascript={(
+        useEffect(()=> {
+          getLocation()
+          setTimeout(() => {
+            setLoc([usrLocation.lat, usrLocation.lng])
+            console.log("loc changed")
+            
+          }, 10000);
+        }, [loc])
+      )}
     />
   )
 }
