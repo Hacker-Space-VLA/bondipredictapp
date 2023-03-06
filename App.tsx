@@ -32,7 +32,6 @@ socket.on("pos", function(data) {
           });
       }
   }
-  console.log(lineas)
 })
 
 // Location
@@ -52,12 +51,12 @@ const requestLocationPermission = async () => {
         buttonPositive: 'OK',
       },
     );
-    console.log('granted', granted);
+    //console.log('granted', granted);
     if (granted === 'granted') {
-      console.log('You can use Geolocation');
+      //console.log('You can use Geolocation');
       return true;
     } else {
-      console.log('You cannot use Geolocation');
+      //console.log('You cannot use Geolocation');
       return false;
     }
   } catch (err) {
@@ -70,20 +69,22 @@ var usrLocation = {
   lng: 0
 }
 function getLocation() {
-  console.log("asked for Geolocation")
+  return new Promise(resolve => {
+    //console.log("asked for Geolocation")
   const result = requestLocationPermission();
   result.then(res => {
     if (res) {
+      
       Geolocation.getCurrentPosition(position => {
-          usrLocation.lat = position.coords.latitude
-          usrLocation.lng = position.coords.longitude
-          var data = [
-            position.coords.latitude,
-            position.coords.longitude
-          ]
-          
-          console.log(data)
-          //return({lat: position.coords.latitude, lng: position.coords.longitude})
+        usrLocation.lat = position.coords.latitude
+        usrLocation.lng = position.coords.longitude
+        var data = [
+          position.coords.latitude,
+          position.coords.longitude
+        ]
+        
+        resolve(data)
+        //return({lat: position.coords.latitude, lng: position.coords.longitude})
         },
         error => {
           // See error code charts below.
@@ -91,9 +92,10 @@ function getLocation() {
         },
         {enableHighAccuracy: true, timeout: 15000, maximumAge: 10000},
       )
-      
     }
-  });
+  }); 
+  })
+  
 }
 
 // Map
@@ -111,11 +113,29 @@ const mapLayers: Layers[] = [
 ];
 
 
-
+var moved = false
 // App
 const App = () => {
-  getLocation()
   var [loc, setLoc] = useState([usrLocation.lat, usrLocation.lng]);
+  
+  const askloc = async () => {
+    //console.log("ask loc")
+    const result = await getLocation()
+    console.log("loc: ", result)
+    return(result)
+  }
+
+  if (moved == false) {
+    askloc().then(function() {
+      setLoc([usrLocation.lat, usrLocation.lng])
+      moved = true
+    })
+  }
+
+  var [buses, setBuses] = useState(lineas)
+
+  
+  
   return (
       <Leaflet
       mapLayers={mapLayers}
@@ -124,17 +144,15 @@ const App = () => {
         latLng: loc,
         zoom: 12,
       }}
-      markers={lineas}
+      markers={buses}
       backgroundColor="#b0d4dc"
       injectJavascript={(
-        useEffect(()=> {
-          getLocation()
-          setTimeout(() => {
-            setLoc([usrLocation.lat, usrLocation.lng])
-            console.log("loc changed")
-            
-          }, 10000);
-        }, [loc])
+        useEffect(() => {
+          setInterval(()=> {
+            setBuses(lineas)
+            console.log("buses: ", buses)
+          }, 1000)
+        }, [buses])
       )}
     />
   )
