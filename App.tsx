@@ -92,25 +92,51 @@ const App = () => {
   bus = text
   return (
     <View>
-      <Text>bus: {text}</Text>
-      <View>
-        <TextInput
-          label="bus"
-          value={text}
-          onChangeText={text => setText(text)}
-          mode="outlined"
-        />
+      <View style={styles.margs}>
+        <View>
+          <Text style={styles.title}>Emisor de ubicación de colectivo de villa la angostura</Text>
+          <Text style={styles.texts}>Escribir la linea que usted está conduciendo para poder identificarlo</Text>
+        </View>
+        
+        <View>
+          <TextInput
+            textColor="white"
+            outlineColor="white"
+            activeOutlineColor="#ff0055"
+            style={{ backgroundColor: '#303030' }}
+            label="colectivo"
+            value={text}
+            onChangeText={text => setText(text)}
+            mode="outlined"
+            autoCapitalize="words"
+          />
+        </View >
+        <Text style={styles.texts}>linea actual: {text}</Text>
       </View>
     </View>
   )
 }
 
 const styles = StyleSheet.create({
-  locview: {
-    backgroundColor: "#3e3e3e",
-    justifyContent: 'center',
-    alignItems: 'center'
-    
+  pads: {
+    padding: 20,
+  },
+  margs: {
+    margin: 20,
+  },
+  texts: {
+
+    paddingTop: 10,
+    color: "#fff",
+    fontSize: 14
+  },
+  title: {    
+    color: "#fff",
+    fontSize: 20,
+    textAlign: 'center',
+    borderBottomColor: '#fff',
+    borderBottomWidth: 2.5,
+    paddingBottom: 10
   }
 })
 export default App;
